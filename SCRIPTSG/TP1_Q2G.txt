@@ -1,0 +1,8 @@
+ Program
+   Variables Setup
+   BeforeStart
+     Script: TP1_Q2_cst.script
+   Robot Program
+     Script: TP1_Q2_OrientationObjetFctG.script
+     Script: TP1_Q2_OrientationFinaleFctG.script
+     Script: TP1_Q2_main.script

@@ -1,0 +1,9 @@
+ Program
+   Variables Setup
+   BeforeStart
+     Script: TP1_Q1_BeforeStart.script
+   Robot Program
+     MoveJ
+       pose_ini
+     Script: TP1_Q1_OrientationG.script
+     Script: TP1_Q1.script

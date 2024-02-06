@@ -1,0 +1,107 @@
+def TP1_Q11G():
+  global _hidden_verificationVariable=0
+  set_safety_mode_transition_hardness(1)
+  set_tool_communication(False, 115200, 0, 1, 1.5, 3.5)
+  set_tool_output_mode(0)
+  set_tool_digital_output_mode(0, 1)
+  set_tool_digital_output_mode(1, 1)
+  set_tool_voltage(0)
+  set_gravity([0.0, 0.0, 9.82])
+  set_tcp(p[0.0,0.0,0.0,0.0,0.0,0.0])
+  set_standard_analog_input_domain(0, 1)
+  set_standard_analog_input_domain(1, 1)
+  set_tool_analog_input_domain(0, 1)
+  set_tool_analog_input_domain(1, 1)
+  set_analog_outputdomain(0, 0)
+  set_analog_outputdomain(1, 0)
+  set_input_actions_to_default()
+  set_target_payload(0.000000, [0.000000, 0.000000, 0.000000], [0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000])
+  step_count_2cb607da_d5cd_454e_b253_9f6d8ff8c923 = 0.0
+  thread Step_Counter_Thread_8dc07199_1a71_4ef3_b4a6_b8c03a1e86af():
+    while (True):
+      step_count_2cb607da_d5cd_454e_b253_9f6d8ff8c923 = step_count_2cb607da_d5cd_454e_b253_9f6d8ff8c923 + 1.0
+      sync()
+    end
+  end
+  run Step_Counter_Thread_8dc07199_1a71_4ef3_b4a6_b8c03a1e86af()
+  global pose_ini_p=p[-.080658813600, -.681405163408, .687199999916, 1.570796327000, .000000000000, -.000000000000]
+  global pose_ini_q=[1.0471975511965987, -1.5707963267948957, 1.5707963267948968, -3.141592653589794, -1.0471975511965983, 3.141592653589791]
+  $ 2 "BeforeStart"
+  $ 3 "Script: TP1_Q1_BeforeStart.script"
+  ### Definition des constantes ###
+  
+  alpha = d2r(60)
+  
+  # Position du robot (coord. homogene) lorsque beta = 90 deg
+  position = [0, -0.6, 0.3, 1]
+  
+  # Transformation homogene entre la base et le support incline
+  H1 = [[sin(alpha),0,cos(alpha),0], [0,1,0,0], [-cos(alpha),0,sin(alpha),0], [0,0,0,1]]
+  H2 = [[0,1,0,0.7], [-1,0,0,0], [0,0,1,0], [0,0,0,1]]
+  H = H1*H2
+  
+  # Variation de beta pour la loop
+  i = 0
+  DeltaBeta = 5
+  betaMin = 30
+  betaMax = 150
+  betaDeg = betaMin
+  $ 4 "Robot Program"
+  $ 5 "MoveJ"
+  $ 6 "pose_ini" "breakAfter"
+  movej(get_inverse_kin(pose_ini_p, qnear=pose_ini_q), a=1.3962634015954636, v=1.0471975511965976)
+  $ 7 "Script: TP1_Q1_OrientationG.script"
+  ### Fonction permettant d'obtenir les invariants naturels a partir de alpha et beta ###
+  
+  def Orientation(alpha, beta):
+  
+  	# --- Implementer les invariants naturels phi et e ici --- #
+  	R10=[[0,-1,0], [1,0,0], [0,0,1]]
+  	R21=[[sin(alpha),0,-cos(alpha)], [0,1,0], [cos(alpha),0,sin(alpha)]]
+  
+  	R32=[[cos(beta),0,-sin(beta)], [-sin(beta),0,-cos(beta)], [0,1,0]]
+  	R30=R10*R21*R32
+  	VECT=0.5*[R30[2,1] - R30[1,2]  , R30[0,2] - R30[2,0], R30[1,0] - R30[0,1]]
+  	TR=R30[0,0]+ R30[1,1] + R30[2,2]
+  	SINPHI=norm(VECT)
+  	COSPHI=(TR-1)/2
+  	phi = atan2(SINPHI,COSPHI)
+  	e = VECT/norm(VECT)
+  
+  
+  
+  	# ------------ #
+  
+  	# Orientation de l'effecteur (axis-angle notation)
+  	AxisAngle = phi*e
+  	return AxisAngle
+  end
+  $ 8 "Script: TP1_Q1.script"
+  
+      ### Programme principale : Loop sur les valeurs de beta ###
+  
+      while betaDeg <= betaMax:
+  
+              	beta = d2r(betaDeg)
+  
+              	# Position de l'effecteur
+              	gamma = beta - 1.57
+              	Q = [[cos(gamma),sin(gamma),0,0], [-sin(gamma),cos(gamma),0,0], [0,0,1,0], [0,0,0,1]]
+              	positionNew = inv(H)*Q*H*position
+  
+              	# Orientation de l'effecteur
+              	AxisAngle = Orientation(alpha, beta)
+    	textmsg("AxisAngle",beta)
+  	#writer.appendLine(textmsg("The axis angle"),beta)
+              	# Pose de l'effecteur
+              	pose = p[positionNew[0], positionNew[1], positionNew[2], AxisAngle[0], AxisAngle[1], AxisAngle[2]]
+  
+              	# Deplacement lineaire (tool-space)
+              	movel(pose, a=0.2, v=0.05, t=0, r=0.01)
+  
+             	i = i+1
+      	betaDeg = betaMin + DeltaBeta*i
+      end
+    end
+  end
+end

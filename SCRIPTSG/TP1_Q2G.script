@@ -1,0 +1,168 @@
+def TP1_Q2G():
+  global _hidden_verificationVariable=0
+  set_safety_mode_transition_hardness(1)
+  set_tool_communication(False, 115200, 0, 1, 1.5, 3.5)
+  set_tool_output_mode(0)
+  set_tool_digital_output_mode(0, 1)
+  set_tool_digital_output_mode(1, 1)
+  set_tool_voltage(0)
+  set_gravity([0.0, 0.0, 9.82])
+  set_tcp(p[0.0,0.0,0.0,0.0,0.0,0.0])
+  set_standard_analog_input_domain(0, 1)
+  set_standard_analog_input_domain(1, 1)
+  set_tool_analog_input_domain(0, 1)
+  set_tool_analog_input_domain(1, 1)
+  set_analog_outputdomain(0, 0)
+  set_analog_outputdomain(1, 0)
+  set_input_actions_to_default()
+  set_target_payload(0.000000, [0.000000, 0.000000, 0.000000], [0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000])
+  step_count_2cb607da_d5cd_454e_b253_9f6d8ff8c923 = 0.0
+  thread Step_Counter_Thread_8dc07199_1a71_4ef3_b4a6_b8c03a1e86af():
+    while (True):
+      step_count_2cb607da_d5cd_454e_b253_9f6d8ff8c923 = step_count_2cb607da_d5cd_454e_b253_9f6d8ff8c923 + 1.0
+      sync()
+    end
+  end
+  run Step_Counter_Thread_8dc07199_1a71_4ef3_b4a6_b8c03a1e86af()
+  $ 2 "BeforeStart"
+  $ 3 "Script: TP1_Q2_cst.script"
+  ### Definition des constantes ###
+  
+  # Position de la rondelle
+  object_location = [-0.08, -0.7, 0]
+  
+  # Pose intermediaire
+  q = [1.047, -1.745, 2.007, -2.0944, -1.3963, 2.7925]
+  
+  # Matrice de rotation de la pose finale
+  Qf = [[0.0066, 0.0029, -1], [-0.9959, -0.0907, -0.0068], [-0.0907, 0.9959, 0.0023]]
+  
+  # Position finale du TCP
+  pf = [-0.68139, -0.13596, 0.2199]
+  $ 4 "Robot Program"
+  $ 5 "Script: TP1_Q2_OrientationObjetFctG.script"
+  ### Votre fonction sortant les angles RPY pour saisir la rondelle ###
+  
+  def OrientationObjet(theta):
+  
+  	# --- Implementer les angles alpha, beta et gamma ici --- #
+  
+  	beta = 0
+  	alpha = 0
+  	gamma = 0
+  	####################
+  	R1=[[0,-1,0],[-1, 0, 0], [0, 0, -1]]
+  	R2= [[sin(theta),cos(theta),0],[cos(theta), -sin(theta), 0], [0, 0, -1]]
+  
+  	R3= [[0,1,0],[1, 0, 0], [0, 0, -1]]
+  
+  	R=R1*R2*R3
+  
+  	betacos=sqrt(pow(R[0,0],2)+ pow(R[1,0],2))
+  	betasin=-R[2,0]
+  	beta=atan2(betasin,betacos)
+  
+  	#
+  	alphacos=R[0,0]/betacos
+  	alphasin=R[1,0]/betacos
+  	alpha=atan2(alphasin,alphacos)
+  	#
+  	gamacos=R[2,2]/betacos
+  	gamasin=R[2,1]/betacos
+  	gama=atan2(gamasin,gamacos)
+  	#################
+  
+  	# -------------- #
+  
+  	betacos=sqrt(pow(R[0,0],2)+ pow(R[1,0],2))
+  
+  	beta=atan2(-R[2,0], sqrt(pow(R[0,0],2)+ pow(R[1,0],2)))
+  	alpha=atan2(R[1,0]/betacos , R[0,0]/betacos)
+  	gamma=atan2(R[2,1]/betacos , R[2,2]/betacos)
+  
+  	RPY = [gamma, beta, alpha]
+  
+  	#RPY = [alpha, beta, gamma]
+  
+  
+  	return RPY
+  end
+  $ 6 "Script: TP1_Q2_OrientationFinaleFctG.script"
+  ### Votre fonction sortant les angles RPY pour saisir la rondelle ###
+  
+  def OrientationFinale(Qf):
+  
+  	# --- Implementer les angles alpha, beta et gamma ici --- #
+  
+  	beta = 0
+  	alpha = 0
+  	gamma = 0
+  
+  	###################
+  
+  
+  	R=Qf
+  
+  	#alpha=atan2(R[1,0],R[0,0])
+  	#beta=0
+  	#gamma=atan2(R[1,0], R[2,2])
+  	betacos=sqrt(pow(R[0,0],2)+ pow(R[1,0],2))
+  	betasin=-R[2,0]
+  	beta=atan2(betasin,betacos)
+  
+  	#
+  	alphacos=R[0,0]/betacos
+  	alphasin=R[1,0]/betacos
+  	alpha=atan2(alphasin,alphacos)
+  	#
+  	gamacos=R[2,2]/betacos
+  	gamasin=R[2,1]/betacos
+  	gama=atan2(gamasin,gamacos)
+  
+  	###################
+  
+  	# ----------------------- #
+  
+  	RPY = [alpha, beta, gamma]
+  
+  	return RPY
+  end
+  
+  $ 7 "Script: TP1_Q2_main.script"
+  ### Programme principal ###
+  
+  # Angle de la rondelle (Vous pouvez changer cette variable pour tester votre programme)
+  theta = 0 # rad
+  
+  # Vecteur contenant les angles RPY (Votre fct)
+  RPY = OrientationObjet(theta)
+  
+  # Conversion necessaire
+  R = rpy2rotvec(RPY)
+  
+  # Pose intermediaire (evitement de singularite)
+  movej(q, a=1.4, v=1.05, t=0, r=0)
+  
+  # On va chercher la rondelle
+  pose_object = p[object_location[0],object_location[1],object_location[2],R[0],R[1],R[2]]
+  pose_object[2]  = pose_object[2] - 0.02
+  movel(pose_object, a=1, v=0.2, t=0, r=0)
+  sleep(3.)
+  
+  # Pose intermediaire (evitement de singularite)
+  movej(q, a=1.4, v=1.05, t=0, r=0)
+  
+  # Angle RPY de la pose finale (Votre fct)
+  RPY = OrientationFinale(Qf)
+  
+  # Conversion necessaire pour le controle du robot
+  R = rpy2rotvec(RPY)
+  
+  # On va depose la rondelle
+  p_f = p[pf[0],pf[1],pf[2],R[0],R[1],R[1]]
+  movel(p_f, a=1, v=0.2, t=0, r=0)
+  sleep(3.)
+  
+  # Retour a la pose intermediaire
+  movej(q, a=1, v=1, t=0, r=0)
+end

@@ -1,0 +1,40 @@
+### Votre fonction sortant les angles RPY pour saisir la rondelle ###
+
+def OrientationFinale(Qf):
+
+	# --- Implementer les angles alpha, beta et gamma ici --- #
+	
+	beta = 0
+	alpha = 0
+	gamma = 0
+
+	###################
+	
+
+	R=Qf
+	
+	#alpha=atan2(R[1,0],R[0,0])
+	#beta=0
+	#gamma=atan2(R[1,0], R[2,2])
+	betacos=sqrt(pow(R[0,0],2)+ pow(R[1,0],2))
+	betasin=-R[2,0]
+	beta=atan2(betasin,betacos)
+	
+	#
+	alphacos=R[0,0]/betacos
+	alphasin=R[1,0]/betacos
+	alpha=atan2(alphasin,alphacos)
+	#
+	gamacos=R[2,2]/betacos
+	gamasin=R[2,1]/betacos
+	gama=atan2(gamasin,gamacos)
+	
+	###################
+
+	# ----------------------- #
+
+	RPY = [alpha, beta, gamma]
+	
+	return RPY
+end
+	

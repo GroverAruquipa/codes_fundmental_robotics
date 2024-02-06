@@ -1,0 +1,46 @@
+### Votre fonction sortant les angles RPY pour saisir la rondelle ###
+
+def OrientationObjet(theta):
+
+	# --- Implementer les angles alpha, beta et gamma ici --- #
+	
+	beta = 0
+	alpha = 0
+	gamma = 0
+	####################
+	R1=[[0,-1,0],[-1, 0, 0], [0, 0, -1]]
+	R2= [[sin(theta),cos(theta),0],[cos(theta), -sin(theta), 0], [0, 0, -1]]
+		
+	R3= [[0,1,0],[1, 0, 0], [0, 0, -1]]
+	
+	R=R1*R2*R3
+	
+	betacos=sqrt(pow(R[0,0],2)+ pow(R[1,0],2))
+	betasin=-R[2,0]
+	beta=atan2(betasin,betacos)
+	
+	#
+	alphacos=R[0,0]/betacos
+	alphasin=R[1,0]/betacos
+	alpha=atan2(alphasin,alphacos)
+	#
+	gamacos=R[2,2]/betacos
+	gamasin=R[2,1]/betacos
+	gama=atan2(gamasin,gamacos)
+	#################
+
+	# -------------- #
+	
+	betacos=sqrt(pow(R[0,0],2)+ pow(R[1,0],2))
+	
+	beta=atan2(-R[2,0], sqrt(pow(R[0,0],2)+ pow(R[1,0],2)))	
+	alpha=atan2(R[1,0]/betacos , R[0,0]/betacos)
+	gamma=atan2(R[2,1]/betacos , R[2,2]/betacos)
+	
+	RPY = [gamma, beta, alpha]
+
+	#RPY = [alpha, beta, gamma]
+
+	
+	return RPY
+end

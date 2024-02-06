@@ -1,0 +1,25 @@
+### Fonction permettant d'obtenir les invariants naturels a partir de alpha et beta ###
+
+def Orientation(alpha, beta):
+
+	# --- Implementer les invariants naturels phi et e ici --- #
+	R10=[[0,-1,0], [1,0,0], [0,0,1]]
+	R21=[[sin(alpha),0,-cos(alpha)], [0,1,0], [cos(alpha),0,sin(alpha)]]
+
+	R32=[[cos(beta),0,-sin(beta)], [-sin(beta),0,-cos(beta)], [0,1,0]]
+	R30=R10*R21*R32 
+	VECT=0.5*[R30[2,1] - R30[1,2]  , R30[0,2] - R30[2,0], R30[1,0] - R30[0,1]]
+	TR=R30[0,0]+ R30[1,1] + R30[2,2]
+	SINPHI=norm(VECT)
+	COSPHI=(TR-1)/2
+	phi = atan2(SINPHI,COSPHI)
+	e = VECT/norm(VECT)
+	
+	
+	
+	# ------------ #
+
+	# Orientation de l'effecteur (axis-angle notation)
+	AxisAngle = phi*e
+	return AxisAngle
+end
